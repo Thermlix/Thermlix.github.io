@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thermlix — Strumenti per la progettazione impiantistica</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+/* ── VARIABILI ─────────────────────────────────────────────────────────── */
+:root {
+  --primary:       #1C4F5E;
+  --primary-light: #26697C;
+  --accent:        #C96B3A;
+  --accent-light:  #E07B47;
+  --bg:            #F7F5F2;
+  --surface:       #FFFFFF;
+  --surface-2:     #EFECE8;
+  --text:          #26302C;
+  --text-muted:    #7A8880;
+  --border:        #DFD9D2;
+  --nav-h:         66px;
+  --r:             12px;
+  --r-sm:          8px;
+  --shadow:        0 2px 16px rgba(28,79,94,.07);
+  --shadow-md:     0 6px 28px rgba(28,79,94,.11);
+
+  /* colori per categoria */
+  --cat-aeraulico:       #2E7D5B;
+  --cat-climatizzazione: #1C4F5E;
+  --cat-idrico:          #2A5FA0;
+  --cat-scarichi:        #6B4FA0;
+  --cat-regolazione:     #8E6030;
+  --cat-bim:             #9E3E5B;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 15px;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+h1,h2,h3 { font-family: 'DM Serif Display', serif; font-weight: 400; line-height: 1.2; }
+a { color: inherit; text-decoration: none; }
+
+/* ── NAVBAR ────────────────────────────────────────────────────────────── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  height: var(--nav-h);
+  background: rgba(247,245,242,.94);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center;
+  padding: 0 5%;
+  transition: box-shadow .3s;
+}
+nav.scrolled { box-shadow: var(--shadow-md); }
+
+.nav-logo {
+  display: flex; align-items: center; gap: 10px;
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.25rem; color: var(--primary);
+  flex-shrink: 0;
+}
+.nav-logo svg { width: 34px; height: 34px; }
+
+.nav-links {
+  display: flex; align-items: center; gap: 4px;
+  margin-left: auto;
+  list-style: none;
+}
+.nav-links a {
+  padding: 6px 13px;
+  border-radius: 20px;
+  font-size: .88rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  transition: color .2s, background .2s;
+  white-space: nowrap;
+}
+.nav-links a:hover { color: var(--primary); background: var(--surface-2); }
+.nav-links a.active { color: var(--primary); background: var(--surface-2); font-weight: 600; }
+
+.nav-search-btn {
+  margin-left: 10px;
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  border: none; background: var(--surface-2);
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  color: var(--text-muted); transition: color .2s, background .2s;
+  flex-shrink: 0;
+}
+.nav-search-btn:hover { color: var(--primary); background: var(--border); }
+
+/* ── HERO ──────────────────────────────────────────────────────────────── */
+#home {
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: calc(var(--nav-h) + 40px) 5% 80px;
+  position: relative; overflow: hidden;
+  text-align: center;
+}
+
+/* sfondo: griglia puntini sottile */
+#home::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image: radial-gradient(circle, rgba(28,79,94,.12) 1px, transparent 1px);
+  background-size: 28px 28px;
+  pointer-events: none;
+}
+/* sfumatura warm in basso */
+#home::after {
+  content: '';
+  position: absolute; bottom: 0; left: 0; right: 0; height: 200px;
+  background: linear-gradient(to bottom, transparent, var(--bg));
+  pointer-events: none;
+}
+
+.hero-inner { position: relative; z-index: 1; max-width: 680px; }
+
+.hero-tag {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 20px; padding: 5px 14px;
+  font-size: .8rem; color: var(--text-muted); margin-bottom: 24px;
+}
+.hero-tag span { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
+
+.hero-inner h1 {
+  font-size: clamp(2.4rem, 6vw, 4rem);
+  color: var(--primary); margin-bottom: 16px;
+  letter-spacing: -.5px;
+}
+
+.hero-tagline {
+  font-size: 1.05rem; color: var(--text-muted);
+  max-width: 500px; margin: 0 auto 36px;
+  font-weight: 300;
+}
+
+/* search bar hero */
+.hero-search {
+  position: relative; max-width: 520px; margin: 0 auto 48px;
+}
+.hero-search input {
+  width: 100%; padding: 14px 52px 14px 20px;
+  border: 1.5px solid var(--border); border-radius: 50px;
+  background: var(--surface); font-family: 'DM Sans', sans-serif;
+  font-size: .95rem; color: var(--text);
+  box-shadow: var(--shadow-md);
+  transition: border-color .2s, box-shadow .2s;
+  outline: none;
+}
+.hero-search input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(28,79,94,.1), var(--shadow-md);
+}
+.hero-search input::placeholder { color: var(--text-muted); }
+.hero-search button {
+  position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+  width: 38px; height: 38px; border-radius: 50%;
+  border: none; background: var(--primary); color: #fff;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: background .2s;
+}
+.hero-search button:hover { background: var(--primary-light); }
+
+/* quick links hero */
+.hero-links { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.hero-link {
+  display: flex; align-items: center; gap: 7px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 10px 18px;
+  font-size: .85rem; font-weight: 500; color: var(--text);
+  box-shadow: var(--shadow);
+  transition: transform .2s, box-shadow .2s, border-color .2s;
+  cursor: pointer;
+}
+.hero-link:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+.hero-link .dot {
+  width: 8px; height: 8px; border-radius: 50%;
+}
+
+/* ── SEARCH RESULTS OVERLAY ────────────────────────────────────────────── */
+#search-overlay {
+  display: none;
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(38,48,44,.45);
+  backdrop-filter: blur(4px);
+}
+#search-overlay.open { display: block; }
+
+#search-panel {
+  position: absolute; top: 80px; left: 50%; transform: translateX(-50%);
+  width: min(680px, 92vw);
+  background: var(--surface); border-radius: var(--r);
+  box-shadow: var(--shadow-md); overflow: hidden;
+}
+.sp-header {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 18px; border-bottom: 1px solid var(--border);
+}
+.sp-header input {
+  flex: 1; border: none; outline: none;
+  font-family: 'DM Sans',sans-serif; font-size: 1rem;
+  color: var(--text); background: transparent;
+}
+.sp-close {
+  border: none; background: none; cursor: pointer;
+  color: var(--text-muted); padding: 4px; border-radius: 4px;
+  transition: color .2s;
+}
+.sp-close:hover { color: var(--text); }
+#search-results-list {
+  max-height: 380px; overflow-y: auto; padding: 10px 0;
+}
+.sr-item {
+  display: flex; align-items: center; gap: 14px;
+  padding: 11px 18px; cursor: pointer;
+  transition: background .15s;
+}
+.sr-item:hover { background: var(--bg); }
+.sr-icon {
+  width: 36px; height: 36px; border-radius: var(--r-sm);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; font-size: .75rem; font-weight: 600; color: #fff;
+}
+.sr-item .sr-title { font-weight: 500; font-size: .9rem; }
+.sr-item .sr-type  { font-size: .77rem; color: var(--text-muted); }
+.sr-empty { padding: 30px; text-align: center; color: var(--text-muted); font-size: .9rem; }
+
+/* ── SEZIONI GENERALI ──────────────────────────────────────────────────── */
+section:not(#home) {
+  padding: 80px 5%;
+  max-width: 1100px; margin: 0 auto;
+}
+section:not(#home):nth-child(even) { /* alternanza leggera */ }
+
+.section-header { margin-bottom: 36px; }
+.section-header h2 { font-size: clamp(1.8rem, 3.5vw, 2.6rem); color: var(--primary); }
+.section-header p { color: var(--text-muted); margin-top: 6px; font-size: .95rem; }
+
+/* ── PILLS CATEGORIA ───────────────────────────────────────────────────── */
+.pills {
+  display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 32px;
+}
+.pill {
+  padding: 6px 16px; border-radius: 20px;
+  border: 1.5px solid var(--border);
+  background: var(--surface); color: var(--text-muted);
+  font-size: .83rem; font-weight: 500;
+  cursor: pointer; transition: all .2s;
+  font-family: 'DM Sans', sans-serif;
+}
+.pill:hover { border-color: var(--primary); color: var(--primary); }
+.pill.active {
+  background: var(--primary); border-color: var(--primary);
+  color: #fff;
+}
+
+/* ── CARD CALCOLATORI ──────────────────────────────────────────────────── */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.calc-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 24px;
+  display: flex; flex-direction: column; gap: 12px;
+  box-shadow: var(--shadow);
+  transition: transform .2s, box-shadow .2s, border-color .2s;
+  opacity: 0; transform: translateY(16px);
+  animation: fadeUp .4s forwards;
+}
+.calc-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+  border-color: rgba(28,79,94,.3);
+}
+
+@keyframes fadeUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.card-cat-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: .75rem; font-weight: 600;
+  padding: 3px 10px; border-radius: 20px;
+  width: fit-content;
+  color: #fff;
+}
+
+.calc-card h3 {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1rem; font-weight: 600;
+  color: var(--text); line-height: 1.4;
+}
+.calc-card p { font-size: .85rem; color: var(--text-muted); flex: 1; }
+
+.card-btn {
+  margin-top: auto;
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 9px 18px; border-radius: var(--r-sm);
+  background: var(--primary); color: #fff;
+  font-size: .84rem; font-weight: 500;
+  border: none; cursor: pointer; width: fit-content;
+  font-family: 'DM Sans', sans-serif;
+  transition: background .2s, transform .15s;
+}
+.card-btn:hover { background: var(--primary-light); transform: translateX(2px); }
+.card-btn svg { flex-shrink: 0; }
+
+/* ── VIDEO ─────────────────────────────────────────────────────────────── */
+.playlist-group { margin-bottom: 48px; }
+.playlist-title {
+  font-size: 1.1rem; font-weight: 600; color: var(--text);
+  margin-bottom: 18px; padding-bottom: 10px;
+  border-bottom: 2px solid var(--surface-2);
+  display: flex; align-items: center; gap: 10px;
+}
+.playlist-title::before {
+  content: ''; display: block;
+  width: 4px; height: 20px; border-radius: 2px;
+  background: var(--accent);
+}
+.video-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 18px;
+}
+.video-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r); overflow: hidden;
+  box-shadow: var(--shadow); transition: transform .2s, box-shadow .2s;
+}
+.video-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+.video-thumb {
+  aspect-ratio: 16/9; background: var(--surface-2);
+  position: relative; overflow: hidden;
+}
+.video-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.play-btn {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(28,79,94,.45);
+  opacity: 0; transition: opacity .2s;
+}
+.video-card:hover .play-btn { opacity: 1; }
+.play-btn svg { color: #fff; }
+.video-card-body { padding: 14px; }
+.video-card-body h4 { font-size: .9rem; font-weight: 600; line-height: 1.4; }
+.video-card-body p { font-size: .8rem; color: var(--text-muted); margin-top: 4px; }
+
+/* ── ARTICOLI ──────────────────────────────────────────────────────────── */
+.article-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 22px 26px;
+  display: flex; gap: 20px; align-items: flex-start;
+  box-shadow: var(--shadow);
+  transition: transform .2s, box-shadow .2s, border-color .2s;
+  opacity: 0; transform: translateY(12px);
+  animation: fadeUp .4s forwards;
+}
+.article-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: rgba(28,79,94,.3);
+}
+.article-card-left { flex-shrink: 0; }
+.article-icon {
+  width: 44px; height: 44px; border-radius: var(--r-sm);
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: .85rem; font-weight: 700;
+}
+.article-card-body { flex: 1; min-width: 0; }
+.article-card-body h3 {
+  font-family: 'DM Sans',sans-serif;
+  font-size: .98rem; font-weight: 600; margin-bottom: 6px;
+}
+.article-card-body p { font-size: .85rem; color: var(--text-muted); margin-bottom: 10px; }
+.article-meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.article-date { font-size: .78rem; color: var(--text-muted); }
+.article-link {
+  font-size: .82rem; font-weight: 600; color: var(--primary);
+  display: inline-flex; align-items: center; gap: 4px;
+}
+.article-link:hover { text-decoration: underline; }
+
+.articles-list { display: flex; flex-direction: column; gap: 14px; }
+
+/* ── EMPTY STATE ───────────────────────────────────────────────────────── */
+.empty-state {
+  text-align: center; padding: 60px 20px;
+  color: var(--text-muted);
+}
+.empty-state svg { color: var(--border); margin-bottom: 16px; }
+.empty-state h3 {
+  font-family:'DM Sans',sans-serif;
+  font-size: 1rem; font-weight: 600; color: var(--text-muted);
+  margin-bottom: 6px;
+}
+.empty-state p { font-size: .85rem; }
+
+/* ── CHI SIAMO ─────────────────────────────────────────────────────────── */
+#chi-siamo-inner {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 48px;
+  box-shadow: var(--shadow);
+}
+#chi-siamo-inner p { color: var(--text-muted); max-width: 600px; line-height: 1.8; }
+
+/* ── CONTATTI ──────────────────────────────────────────────────────────── */
+#contatti-inner {
+  background: var(--primary); border-radius: var(--r);
+  padding: 48px; color: #fff;
+}
+#contatti-inner h2 { color: #fff; margin-bottom: 10px; }
+#contatti-inner p { opacity: .7; margin-bottom: 24px; }
+.contact-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: #fff; color: var(--primary);
+  padding: 11px 24px; border-radius: var(--r-sm);
+  font-weight: 600; font-size: .9rem;
+  transition: opacity .2s;
+}
+.contact-btn:hover { opacity: .9; }
+
+/* ── FOOTER ────────────────────────────────────────────────────────────── */
+footer {
+  background: var(--text); color: rgba(255,255,255,.6);
+  padding: 32px 5%; text-align: center;
+  font-size: .82rem;
+}
+footer strong { color: rgba(255,255,255,.9); }
+
+/* ── SEZIONE WRAPPER (per padding full width) ─────────────────────────── */
+.section-full { width: 100%; padding: 80px 5%; }
+.section-full > * { max-width: 1100px; margin: 0 auto; }
+
+/* ── RESPONSIVE ────────────────────────────────────────────────────────── */
+@media (max-width: 700px) {
+  .nav-links { display: none; }
+  section:not(#home) { padding: 60px 5%; }
+  .article-card { flex-direction: column; }
+  #chi-siamo-inner, #contatti-inner { padding: 28px; }
+  .cards-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     NAVBAR
+════════════════════════════════════════════════════════════════════════ -->
+<nav id="navbar">
+  <a class="nav-logo" href="#home">
+    <!-- Logo SVG -->
+    <svg viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="34" height="34" rx="9" fill="#1C4F5E"/>
+      <path d="M9 11h16M17 11v13" stroke="white" stroke-width="2.4" stroke-linecap="round"/>
+      <path d="M21 15.5c0-2.5-1.8-4.5-4-4.5" stroke="#C96B3A" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+    Thermlix
+  </a>
+  <ul class="nav-links">
+    <li><a href="#home"       class="nav-link active">Home</a></li>
+    <li><a href="#calcolatori" class="nav-link">Calcolatori</a></li>
+    <li><a href="#video"      class="nav-link">Video</a></li>
+    <li><a href="#articoli"   class="nav-link">Articoli</a></li>
+    <li><a href="#chi-siamo"  class="nav-link">Chi siamo</a></li>
+    <li><a href="#contatti"   class="nav-link">Contatti</a></li>
+  </ul>
+  <button class="nav-search-btn" onclick="openSearch()" aria-label="Cerca">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg>
+  </button>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     SEARCH OVERLAY
+════════════════════════════════════════════════════════════════════════ -->
+<div id="search-overlay" onclick="closeSearch(event)">
+  <div id="search-panel">
+    <div class="sp-header">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7A8880" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" id="sp-input" placeholder="Cerca calcolatori, video, articoli…" oninput="runSearch(this.value)">
+      <button class="sp-close" onclick="closeSearch()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div id="search-results-list"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     HOME / HERO
+════════════════════════════════════════════════════════════════════════ -->
+<section id="home">
+  <div class="hero-inner">
+    <div class="hero-tag"><span></span> Strumenti per la progettazione impiantistica</div>
+    <h1>Thermlix</h1>
+    <p class="hero-tagline">
+      <!-- ✏️ MODIFICA QUI LA TUA TAGLINE -->
+      La tua tagline qui — descrivi in una frase cosa offre il sito
+    </p>
+    <div class="hero-search">
+      <input type="text" placeholder="Cerca calcolatori, video, articoli…" onfocus="openSearch()" readonly>
+      <button onclick="openSearch()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg>
+      </button>
+    </div>
+    <div class="hero-links">
+      <a class="hero-link" href="#calcolatori">
+        <span class="dot" style="background:var(--primary)"></span> Calcolatori
+      </a>
+      <a class="hero-link" href="#video">
+        <span class="dot" style="background:var(--accent)"></span> Video
+      </a>
+      <a class="hero-link" href="#articoli">
+        <span class="dot" style="background:var(--cat-regolazione)"></span> Articoli
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     CALCOLATORI
+════════════════════════════════════════════════════════════════════════ -->
+<div class="section-full" id="calcolatori-wrap">
+<section id="calcolatori">
+  <div class="section-header">
+    <h2>Calcolatori</h2>
+    <p>Strumenti di calcolo per la progettazione impiantistica</p>
+  </div>
+  <div class="pills" id="calc-pills">
+    <button class="pill active" data-cat="tutti" onclick="filterCalc('tutti')">Tutti</button>
+    <button class="pill" data-cat="aeraulico"       onclick="filterCalc('aeraulico')">Aeraulico</button>
+    <button class="pill" data-cat="climatizzazione" onclick="filterCalc('climatizzazione')">Climatizzazione</button>
+    <button class="pill" data-cat="idrico-sanitario" onclick="filterCalc('idrico-sanitario')">Idrico-sanitario</button>
+    <button class="pill" data-cat="scarichi"        onclick="filterCalc('scarichi')">Scarichi</button>
+  </div>
+  <div id="calc-grid" class="cards-grid"></div>
+</section>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     VIDEO
+════════════════════════════════════════════════════════════════════════ -->
+<div class="section-full" style="background: var(--surface);">
+<section id="video">
+  <div class="section-header">
+    <h2>Video</h2>
+    <p>Tutorial, approfondimenti e guide alla progettazione</p>
+  </div>
+  <div id="video-container"></div>
+</section>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     ARTICOLI
+════════════════════════════════════════════════════════════════════════ -->
+<div class="section-full">
+<section id="articoli">
+  <div class="section-header">
+    <h2>Articoli</h2>
+    <p>Approfondimenti tecnici, normativa e casi studio</p>
+  </div>
+  <div class="pills" id="art-pills">
+    <button class="pill active" data-cat="tutti" onclick="filterArticoli('tutti')">Tutti</button>
+    <button class="pill" data-cat="aeraulico"        onclick="filterArticoli('aeraulico')">Aeraulico</button>
+    <button class="pill" data-cat="climatizzazione"  onclick="filterArticoli('climatizzazione')">Climatizzazione</button>
+    <button class="pill" data-cat="idrico-sanitario" onclick="filterArticoli('idrico-sanitario')">Idrico-sanitario</button>
+    <button class="pill" data-cat="scarichi"         onclick="filterArticoli('scarichi')">Scarichi</button>
+    <button class="pill" data-cat="regolazione"      onclick="filterArticoli('regolazione')">Regolazione</button>
+    <button class="pill" data-cat="bim"              onclick="filterArticoli('bim')">BIM</button>
+  </div>
+  <div id="articoli-list" class="articles-list"></div>
+</section>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     CHI SIAMO
+════════════════════════════════════════════════════════════════════════ -->
+<div class="section-full" style="background: var(--surface);">
+<section id="chi-siamo">
+  <div class="section-header">
+    <h2>Chi siamo</h2>
+  </div>
+  <div id="chi-siamo-inner">
+    <!-- ✏️ MODIFICA QUI IL TESTO "CHI SIAMO" -->
+    <p>Questa sezione descrive il tuo studio e la tua attività. Sostituisci questo testo con la tua presentazione: chi sei, cosa fai, qual è la tua specializzazione e perché hai creato questo sito.</p>
+  </div>
+</section>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     CONTATTI
+════════════════════════════════════════════════════════════════════════ -->
+<div class="section-full">
+<section id="contatti">
+  <div id="contatti-inner">
+    <h2>Contatti</h2>
+    <!-- ✏️ MODIFICA QUI EMAIL E TESTO -->
+    <p>Hai domande, suggerimenti o vuoi collaborare? Scrivimi.</p>
+    <a class="contact-btn" href="mailto:tua@email.com">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+      Scrivimi
+    </a>
+  </div>
+</section>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     FOOTER
+════════════════════════════════════════════════════════════════════════ -->
+<footer>
+  <strong>Thermlix</strong> — Strumenti per la progettazione impiantistica<br>
+  <span style="font-size:.75rem;opacity:.5;margin-top:6px;display:block">
+    I calcolatori sono a scopo indicativo. Il progettista è responsabile della verifica finale.
+  </span>
+</footer>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     JAVASCRIPT — DATI + LOGICA
+     ✏️  Per aggiungere contenuti modifica solo le sezioni
+         "CALCOLATORI", "PLAYLIST VIDEO" e "ARTICOLI" qui sotto
+════════════════════════════════════════════════════════════════════════ -->
+<script>
+
+/* ──────────────────────────────────────────────────────────────────────────
+   ✏️ CALCOLATORI — aggiungi un oggetto per ogni nuovo calcolatore
+   Campi:
+     titolo:      nome del calcolatore
+     categoria:   "aeraulico" | "climatizzazione" | "idrico-sanitario" | "scarichi"
+     descrizione: breve descrizione (1-2 righe)
+     file:        nome del file HTML (deve essere nella stessa cartella)
+     tags:        parole chiave per la ricerca
+──────────────────────────────────────────────────────────────────────────── */
+const CALCOLATORI = [
+  {
+    titolo: "Vaso d'Espansione – Riscaldamento",
+    categoria: "climatizzazione",
+    descrizione: "Dimensionamento del vaso secondo Caleffi 01079, Serie 556. Calcola Vn, pressione precarica e taglia commerciale.",
+    file: "vaso-espansione-riscaldamento.html",
+    tags: ["vaso espansione", "riscaldamento", "caleffi", "pressione", "din 4807"]
+  }
+  /* Esempio per aggiungerne uno:
+  ,{
+    titolo: "Dimensionamento Scarichi UNI EN 12056-2",
+    categoria: "scarichi",
+    descrizione: "Calcolo portate acque reflue, dimensionamento diramazioni e colonne di scarico.",
+    file: "scarichi-uni-12056.html",
+    tags: ["scarichi", "uni 12056", "diramazioni", "colonne"]
+  }
+  */
+];
+
+/* ──────────────────────────────────────────────────────────────────────────
+   ✏️ PLAYLIST VIDEO — aggiungi un oggetto per ogni playlist
+   Campi:
+     titolo:  nome della playlist
+     video:   array di video, ognuno con:
+       titolo:     titolo del video
+       youtubeId:  codice YouTube (la parte dopo "watch?v=")
+       descrizione: breve descrizione
+──────────────────────────────────────────────────────────────────────────── */
+const PLAYLIST_VIDEO = [
+  /* Esempio:
+  {
+    titolo: "Impianti di riscaldamento",
+    video: [
+      {
+        titolo: "Come dimensionare un vaso di espansione",
+        youtubeId: "dQw4w9WgXcQ",
+        descrizione: "Guida pratica al dimensionamento con esempi reali"
+      }
+    ]
+  }
+  */
+];
+
+/* ──────────────────────────────────────────────────────────────────────────
+   ✏️ ARTICOLI — aggiungi un oggetto per ogni articolo
+   Campi:
+     titolo:    titolo dell'articolo
+     categoria: "aeraulico"|"climatizzazione"|"idrico-sanitario"|"scarichi"|"regolazione"|"bim"
+     data:      "YYYY-MM-DD"
+     estratto:  breve riassunto (1-2 righe)
+     url:       percorso al file o link esterno
+──────────────────────────────────────────────────────────────────────────── */
+const ARTICOLI = [
+  /* Esempio:
+  {
+    titolo: "UNI EN 12056-2: guida al dimensionamento degli scarichi",
+    categoria: "scarichi",
+    data: "2025-06-01",
+    estratto: "Una guida pratica all'applicazione della norma con esempi numerici.",
+    url: "articoli/uni-12056-guida.html"
+  }
+  */
+];
+
+/* ──────────────────────────────────────────────────────────────────────────
+   COLORI CATEGORIA (non modificare salvo esigenze)
+──────────────────────────────────────────────────────────────────────────── */
+const CAT_COLORS = {
+  'aeraulico':        '#2E7D5B',
+  'climatizzazione':  '#1C4F5E',
+  'idrico-sanitario': '#2A5FA0',
+  'scarichi':         '#6B4FA0',
+  'regolazione':      '#8E6030',
+  'bim':              '#9E3E5B'
+};
+const CAT_LABELS = {
+  'aeraulico':        'Aeraulico',
+  'climatizzazione':  'Climatizzazione',
+  'idrico-sanitario': 'Idrico-sanitario',
+  'scarichi':         'Scarichi',
+  'regolazione':      'Regolazione',
+  'bim':              'BIM'
+};
+
+/* ═══════════════════════════════════
+   RENDER CALCOLATORI
+═══════════════════════════════════ */
+function renderCalc(cat = 'tutti') {
+  const grid = document.getElementById('calc-grid');
+  const items = cat === 'tutti' ? CALCOLATORI : CALCOLATORI.filter(c => c.categoria === cat);
+  if (!items.length) {
+    grid.innerHTML = emptyState('Nessun calcolatore', cat === 'tutti'
+      ? 'I calcolatori saranno pubblicati presto.'
+      : 'Nessun calcolatore disponibile in questa categoria.');
+    return;
+  }
+  grid.innerHTML = items.map((c, i) => `
+    <div class="calc-card" style="animation-delay:${i * 60}ms">
+      <span class="card-cat-badge" style="background:${CAT_COLORS[c.categoria] || '#999'}">
+        ${CAT_LABELS[c.categoria] || c.categoria}
+      </span>
+      <h3>${c.titolo}</h3>
+      <p>${c.descrizione}</p>
+      <a href="${c.file}" class="card-btn">
+        Apri calcolatore
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+    </div>`).join('');
+}
+
+function filterCalc(cat) {
+  document.querySelectorAll('#calc-pills .pill').forEach(p =>
+    p.classList.toggle('active', p.dataset.cat === cat));
+  renderCalc(cat);
+}
+
+/* ═══════════════════════════════════
+   RENDER VIDEO
+═══════════════════════════════════ */
+function renderVideo() {
+  const container = document.getElementById('video-container');
+  if (!PLAYLIST_VIDEO.length) {
+    container.innerHTML = emptyState('Video in arrivo', 'I video saranno pubblicati presto. Aggiungi le tue playlist nel file index.html.');
+    return;
+  }
+  container.innerHTML = PLAYLIST_VIDEO.map(pl => `
+    <div class="playlist-group">
+      <div class="playlist-title">${pl.titolo}</div>
+      <div class="video-grid">
+        ${pl.video.map(v => `
+          <div class="video-card" onclick="window.open('https://youtube.com/watch?v=${v.youtubeId}','_blank')">
+            <div class="video-thumb">
+              <img src="https://img.youtube.com/vi/${v.youtubeId}/mqdefault.jpg" alt="${v.titolo}" loading="lazy">
+              <div class="play-btn">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10" fill="rgba(255,255,255,.25)"/><polygon points="10,8 16,12 10,16"/></svg>
+              </div>
+            </div>
+            <div class="video-card-body">
+              <h4>${v.titolo}</h4>
+              ${v.descrizione ? `<p>${v.descrizione}</p>` : ''}
+            </div>
+          </div>`).join('')}
+      </div>
+    </div>`).join('');
+}
+
+/* ═══════════════════════════════════
+   RENDER ARTICOLI
+═══════════════════════════════════ */
+function renderArticoli(cat = 'tutti') {
+  const list = document.getElementById('articoli-list');
+  const items = cat === 'tutti' ? ARTICOLI : ARTICOLI.filter(a => a.categoria === cat);
+  if (!items.length) {
+    list.innerHTML = emptyState('Articoli in arrivo', 'Gli articoli saranno pubblicati presto.');
+    return;
+  }
+  list.innerHTML = items.map((a, i) => {
+    const d = new Date(a.data);
+    const dateStr = d.toLocaleDateString('it-IT', {day:'2-digit', month:'long', year:'numeric'});
+    const color = CAT_COLORS[a.categoria] || '#999';
+    const label = CAT_LABELS[a.categoria] || a.categoria;
+    return `
+    <div class="article-card" style="animation-delay:${i * 50}ms">
+      <div class="article-card-left">
+        <div class="article-icon" style="background:${color}">${label.slice(0,2).toUpperCase()}</div>
+      </div>
+      <div class="article-card-body">
+        <h3>${a.titolo}</h3>
+        <p>${a.estratto}</p>
+        <div class="article-meta">
+          <span class="article-date">${dateStr}</span>
+          <a href="${a.url}" class="article-link">
+            Leggi
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>`;}).join('');
+}
+
+function filterArticoli(cat) {
+  document.querySelectorAll('#art-pills .pill').forEach(p =>
+    p.classList.toggle('active', p.dataset.cat === cat));
+  renderArticoli(cat);
+}
+
+/* ═══════════════════════════════════
+   RICERCA GLOBALE
+═══════════════════════════════════ */
+function openSearch() {
+  document.getElementById('search-overlay').classList.add('open');
+  setTimeout(() => document.getElementById('sp-input').focus(), 80);
+  runSearch('');
+}
+function closeSearch(e) {
+  if (e && e.target !== document.getElementById('search-overlay')) return;
+  document.getElementById('search-overlay').classList.remove('open');
+  document.getElementById('sp-input').value = '';
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSearch(); });
+
+function runSearch(q) {
+  const list = document.getElementById('search-results-list');
+  q = q.toLowerCase().trim();
+  const results = [];
+
+  CALCOLATORI.forEach(c => {
+    if (!q || c.titolo.toLowerCase().includes(q) ||
+        c.descrizione.toLowerCase().includes(q) ||
+        (c.tags && c.tags.some(t => t.includes(q)))) {
+      results.push({ tipo: 'Calcolatore', titolo: c.titolo,
+        color: CAT_COLORS[c.categoria], url: c.file });
+    }
+  });
+  PLAYLIST_VIDEO.forEach(pl => pl.video.forEach(v => {
+    if (!q || v.titolo.toLowerCase().includes(q) ||
+        (v.descrizione && v.descrizione.toLowerCase().includes(q))) {
+      results.push({ tipo: 'Video', titolo: v.titolo,
+        color: '#C96B3A', url: `https://youtube.com/watch?v=${v.youtubeId}` });
+    }
+  }));
+  ARTICOLI.forEach(a => {
+    if (!q || a.titolo.toLowerCase().includes(q) ||
+        a.estratto.toLowerCase().includes(q)) {
+      results.push({ tipo: 'Articolo', titolo: a.titolo,
+        color: CAT_COLORS[a.categoria], url: a.url });
+    }
+  });
+
+  if (!results.length) {
+    list.innerHTML = `<div class="sr-empty">${q ? 'Nessun risultato per "' + q + '"' : 'Inizia a digitare per cercare…'}</div>`;
+    return;
+  }
+  list.innerHTML = results.map(r => `
+    <div class="sr-item" onclick="window.location='${r.url}'">
+      <div class="sr-icon" style="background:${r.color}">${r.tipo.slice(0,1)}</div>
+      <div>
+        <div class="sr-title">${r.titolo}</div>
+        <div class="sr-type">${r.tipo}</div>
+      </div>
+    </div>`).join('');
+}
+
+/* ═══════════════════════════════════
+   NAV ACTIVE ON SCROLL
+═══════════════════════════════════ */
+const sections = ['home','calcolatori','video','articoli','chi-siamo','contatti'];
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const id = e.target.id;
+      document.querySelectorAll('.nav-link').forEach(a =>
+        a.classList.toggle('active', a.getAttribute('href') === '#' + id));
+    }
+  });
+}, { threshold: .25, rootMargin: `-${66}px 0px 0px 0px` });
+
+sections.forEach(id => {
+  const el = document.getElementById(id);
+  if (el) observer.observe(el);
+});
+
+// navbar shadow on scroll
+window.addEventListener('scroll', () => {
+  document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 20);
+});
+
+/* ═══════════════════════════════════
+   EMPTY STATE helper
+═══════════════════════════════════ */
+function emptyState(title, msg) {
+  return `<div class="empty-state">
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 9h6M9 12h6M9 15h4"/></svg>
+    <h3>${title}</h3><p>${msg}</p>
+  </div>`;
+}
+
+/* ═══════════════════════════════════
+   INIT
+═══════════════════════════════════ */
+renderCalc();
+renderVideo();
+renderArticoli();
+</script>
+</body>
+</html>
